@@ -10,18 +10,34 @@
         />
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <style>
+            :root {
+                --bg-primary: #121212;
+                --bg-secondary: #1e1e1e;
+                --bg-card: #252525;
+                --bg-hover: #2a2a2a;
+                --text-primary: #ffffff;
+                --text-secondary: #b0b0b0;
+                --accent-primary: #bb86fc;
+                --accent-secondary: #03dac6;
+                --success: #00c853;
+                --danger: #cf6679;
+                --warning: #ffd700;
+                --border-radius: 12px;
+                --transition: all 0.3s ease;
+            }
+
             * {
                 margin: 0;
                 padding: 0;
                 box-sizing: border-box;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             }
 
             body {
-                background: #f5f7fa;
+                background: var(--bg-primary);
                 min-height: 100vh;
                 padding: 20px;
-                color: #333;
+                color: var(--text-primary);
             }
 
             .container {
@@ -32,12 +48,14 @@
             .header {
                 text-align: center;
                 margin-bottom: 30px;
+                padding: 20px;
             }
 
             .header h1 {
                 font-size: 2.5rem;
                 margin-bottom: 10px;
-                color: #2c3e50;
+                color: var(--accent-primary);
+                font-weight: 300;
             }
 
             .dashboard {
@@ -48,32 +66,46 @@
             }
 
             .card {
-                background: white;
-                border-radius: 12px;
+                background: var(--bg-card);
+                border-radius: var(--border-radius);
                 padding: 20px;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
                 text-align: center;
+                transition: var(--transition);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+                border-color: rgba(187, 134, 252, 0.2);
             }
 
             .stat-card.income {
-                border-left: 4px solid #27ae60;
+                border-left: 4px solid var(--success);
             }
 
             .stat-card.expense {
-                border-left: 4px solid #e74c3c;
+                border-left: 4px solid var(--danger);
             }
 
             .stat-card.balance {
-                border-left: 4px solid #3498db;
+                border-left: 4px solid var(--accent-primary);
             }
 
             .stat-card.budget {
-                border-left: 4px solid #f39c12;
+                border-left: 4px solid var(--warning);
             }
 
             .stat-card h3 {
                 font-size: 1.8rem;
                 margin-bottom: 5px;
+                font-weight: 300;
+            }
+
+            .stat-card p {
+                color: var(--text-secondary);
+                font-size: 0.9rem;
             }
 
             .main-content {
@@ -89,16 +121,33 @@
             }
 
             .form-section {
-                background: white;
-                border-radius: 12px;
+                background: var(--bg-card);
+                border-radius: var(--border-radius);
                 padding: 25px;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
                 margin-bottom: 25px;
+                border: 1px solid rgba(255, 255, 255, 0.05);
             }
 
             .section-header {
                 margin-bottom: 20px;
-                color: #2c3e50;
+                color: var(--text-primary);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .section-header h2 {
+                font-weight: 300;
+                font-size: 1.5rem;
+            }
+
+            .form-controls {
+                display: flex;
+                gap: 15px;
+                flex-wrap: wrap;
             }
 
             .form-row {
@@ -120,76 +169,96 @@
 
             .form-group label {
                 display: block;
-                margin-bottom: 5px;
-                font-weight: 600;
-                color: #555;
+                margin-bottom: 8px;
+                font-weight: 500;
+                color: var(--text-secondary);
+                font-size: 0.9rem;
             }
 
             .form-control {
                 width: 100%;
-                padding: 12px;
-                border: 1px solid #ddd;
-                border-radius: 6px;
+                padding: 12px 15px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
                 font-size: 1rem;
+                background: rgba(255, 255, 255, 0.05);
+                color: var(--text-primary);
+                transition: var(--transition);
+            }
+
+            .form-control:focus {
+                outline: none;
+                border-color: var(--accent-primary);
+                box-shadow: 0 0 0 2px rgba(187, 134, 252, 0.2);
             }
 
             .btn {
-                background: #3498db;
-                color: white;
+                background: var(--accent-primary);
+                color: #121212;
                 border: none;
                 padding: 12px 20px;
-                border-radius: 6px;
+                border-radius: 8px;
                 cursor: pointer;
                 font-weight: 600;
-                transition: background 0.3s;
+                transition: var(--transition);
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
             }
 
             .btn:hover {
-                background: #2980b9;
+                background: #d0a6ff;
+                transform: translateY(-2px);
             }
 
             .btn-income {
-                background: #27ae60;
+                background: var(--success);
+                color: #000;
             }
 
             .btn-income:hover {
-                background: #229954;
+                background: #00e676;
             }
 
             .btn-expense {
-                background: #e74c3c;
+                background: var(--danger);
+                color: #000;
             }
 
             .btn-expense:hover {
-                background: #c0392b;
+                background: #ff7997;
             }
 
             .quick-amounts {
                 display: flex;
-                gap: 10px;
+                gap: 8px;
                 flex-wrap: wrap;
                 margin-top: 10px;
             }
 
             .quick-amount {
-                background: #ecf0f1;
-                border: none;
-                padding: 8px 12px;
+                background: rgba(255, 255, 255, 0.08);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                padding: 6px 12px;
                 border-radius: 20px;
                 cursor: pointer;
-                font-size: 0.9rem;
-                transition: background 0.3s;
+                font-size: 0.85rem;
+                transition: var(--transition);
+                color: var(--text-secondary);
             }
 
             .quick-amount:hover {
-                background: #bdc3c7;
+                background: rgba(187, 134, 252, 0.2);
+                color: var(--accent-primary);
+                border-color: var(--accent-primary);
             }
 
             .transactions-section {
-                background: white;
-                border-radius: 12px;
+                background: var(--bg-card);
+                border-radius: var(--border-radius);
                 padding: 25px;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+                border: 1px solid rgba(255, 255, 255, 0.05);
             }
 
             .transaction-lists {
@@ -205,9 +274,10 @@
             }
 
             .transaction-list-section {
-                border: 1px solid #eee;
+                border: 1px solid rgba(255, 255, 255, 0.05);
                 border-radius: 8px;
                 padding: 15px;
+                background: rgba(0, 0, 0, 0.2);
             }
 
             .list-header {
@@ -216,15 +286,20 @@
                 align-items: center;
                 margin-bottom: 15px;
                 padding-bottom: 10px;
-                border-bottom: 1px solid #eee;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             }
 
             .list-header h3 {
-                color: #27ae60;
+                color: var(--success);
+                font-weight: 400;
+                font-size: 1.2rem;
+                display: flex;
+                align-items: center;
+                gap: 8px;
             }
 
             .list-header.expense h3 {
-                color: #e74c3c;
+                color: var(--danger);
             }
 
             .transaction-list {
@@ -232,12 +307,32 @@
                 overflow-y: auto;
             }
 
+            .transaction-list::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .transaction-list::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 3px;
+            }
+
+            .transaction-list::-webkit-scrollbar-thumb {
+                background: var(--accent-primary);
+                border-radius: 3px;
+            }
+
             .transaction-item {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                padding: 10px;
-                border-bottom: 1px solid #f5f5f5;
+                padding: 12px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+                transition: var(--transition);
+            }
+
+            .transaction-item:hover {
+                background: var(--bg-hover);
+                border-radius: 6px;
             }
 
             .transaction-item:last-child {
@@ -249,63 +344,110 @@
             }
 
             .transaction-title {
-                font-weight: 600;
-                margin-bottom: 3px;
+                font-weight: 500;
+                margin-bottom: 4px;
+                font-size: 0.95rem;
             }
 
             .transaction-category {
-                font-size: 0.85rem;
-                color: #7f8c8d;
+                font-size: 0.8rem;
+                color: var(--text-secondary);
+                background: rgba(255, 255, 255, 0.05);
+                padding: 2px 8px;
+                border-radius: 10px;
+                display: inline-block;
             }
 
             .transaction-date {
-                font-size: 0.8rem;
-                color: #95a5a6;
+                font-size: 0.75rem;
+                color: var(--text-secondary);
+                margin-top: 4px;
             }
 
             .transaction-amount {
-                font-weight: 700;
-                font-size: 1.1rem;
+                font-weight: 600;
+                font-size: 1rem;
+                min-width: 80px;
+                text-align: right;
             }
 
             .amount-income {
-                color: #27ae60;
+                color: var(--success);
             }
 
             .amount-expense {
-                color: #e74c3c;
+                color: var(--danger);
             }
 
             .delete-btn {
                 background: none;
                 border: none;
-                color: #95a5a6;
+                color: var(--text-secondary);
                 cursor: pointer;
                 font-size: 1rem;
                 margin-left: 10px;
+                transition: var(--transition);
+                padding: 5px;
+                border-radius: 4px;
             }
 
             .delete-btn:hover {
-                color: #e74c3c;
+                color: var(--danger);
+                background: rgba(207, 102, 121, 0.1);
             }
 
             .empty-state {
                 text-align: center;
-                padding: 30px;
-                color: #95a5a6;
+                padding: 40px 20px;
+                color: var(--text-secondary);
+            }
+
+            .empty-state i {
+                font-size: 2rem;
+                margin-bottom: 15px;
+                opacity: 0.5;
             }
 
             .chart-container {
-                background: white;
-                border-radius: 12px;
-                padding: 20px;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                background: var(--bg-card);
+                border-radius: var(--border-radius);
+                padding: 25px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
                 margin-top: 25px;
+                border: 1px solid rgba(255, 255, 255, 0.05);
             }
 
-            .chart-container h3 {
-                margin-bottom: 15px;
-                color: #2c3e50;
+            .chart-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .chart-header h3 {
+                font-weight: 400;
+                font-size: 1.3rem;
+                color: var(--text-primary);
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .chart-controls {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+
+            .control-select {
+                padding: 8px 12px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 6px;
+                background: rgba(255, 255, 255, 0.05);
+                color: var(--text-primary);
+                font-size: 0.9rem;
             }
 
             .notification {
@@ -313,13 +455,14 @@
                 top: 20px;
                 right: 20px;
                 padding: 15px 20px;
-                border-radius: 6px;
+                border-radius: 8px;
                 color: white;
-                font-weight: 600;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+                font-weight: 500;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
                 transform: translateX(120%);
                 transition: transform 0.3s ease;
                 z-index: 1000;
+                border: 1px solid rgba(255, 255, 255, 0.1);
             }
 
             .notification.show {
@@ -327,11 +470,13 @@
             }
 
             .notification.success {
-                background: #27ae60;
+                background: rgba(0, 200, 83, 0.2);
+                border-color: var(--success);
             }
 
             .notification.error {
-                background: #e74c3c;
+                background: rgba(207, 102, 121, 0.2);
+                border-color: var(--danger);
             }
 
             .tabs {
@@ -342,23 +487,56 @@
 
             .tab {
                 padding: 10px 20px;
-                background: #ecf0f1;
-                border: none;
-                border-radius: 6px;
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
                 cursor: pointer;
-                font-weight: 600;
-                transition: all 0.3s;
+                font-weight: 500;
+                transition: var(--transition);
+                color: var(--text-secondary);
             }
 
             .tab.active {
-                background: #3498db;
-                color: white;
+                background: var(--accent-primary);
+                color: #121212;
+                border-color: var(--accent-primary);
+            }
+
+            .tab:hover:not(.active) {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .budget-progress {
+                height: 8px;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 4px;
+                margin-top: 10px;
+                overflow: hidden;
+            }
+
+            .budget-progress-fill {
+                height: 100%;
+                width: 0%;
+                background: var(--warning);
+                border-radius: 4px;
+                transition: width 0.5s ease;
+            }
+
+            .budget-info {
+                font-size: 0.85rem;
+                color: var(--text-secondary);
+                margin-top: 8px;
+            }
+
+            .budget-info span {
+                color: var(--text-primary);
+                font-weight: 500;
             }
 
             /* Адаптивность для мобильных устройств */
             @media (max-width: 768px) {
                 body {
-                    padding: 10px;
+                    padding: 15px;
                 }
 
                 .header h1 {
@@ -390,6 +568,17 @@
                 .tab {
                     width: 100%;
                     text-align: center;
+                }
+
+                .section-header,
+                .chart-header {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+
+                .form-controls,
+                .chart-controls {
+                    width: 100%;
                 }
             }
 
@@ -430,24 +619,16 @@
                 <div class="card stat-card budget">
                     <h3 id="budgetUsage">0%</h3>
                     <p>Бюджет</p>
-                    <div
-                        style="
-                            height: 8px;
-                            background: #ecf0f1;
-                            border-radius: 4px;
-                            margin-top: 10px;
-                            overflow: hidden;
-                        "
-                    >
+                    <div class="budget-progress">
                         <div
                             id="budgetProgress"
-                            style="
-                                height: 100%;
-                                width: 0%;
-                                background: #f39c12;
-                                border-radius: 4px;
-                            "
+                            class="budget-progress-fill"
+                            style="width: 0%"
                         ></div>
+                    </div>
+                    <div class="budget-info">
+                        Использовано: <span id="budgetUsed">0</span> из
+                        <span id="budgetLimitValue">0</span> ₽
                     </div>
                 </div>
             </div>
@@ -455,7 +636,24 @@
             <div class="main-content">
                 <div>
                     <div class="form-section">
-                        <h2 class="section-header">Добавить транзакцию</h2>
+                        <div class="section-header">
+                            <h2>
+                                <i class="fas fa-plus-circle"></i> Добавить
+                                транзакцию
+                            </h2>
+                            <div class="form-controls">
+                                <input
+                                    type="number"
+                                    id="budgetLimitInput"
+                                    class="form-control"
+                                    placeholder="Лимит бюджета"
+                                    min="0"
+                                />
+                                <button id="saveBudgetBtn" class="btn">
+                                    <i class="fas fa-save"></i> Сохранить бюджет
+                                </button>
+                            </div>
+                        </div>
 
                         <div class="tabs">
                             <button class="tab active" data-tab="income">
@@ -504,8 +702,6 @@
                                         </button>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="form-row">
                                 <div class="form-group">
                                     <label for="incomeCategory"
                                         >Категория</label
@@ -525,6 +721,8 @@
                                         <option value="other">Другое</option>
                                     </select>
                                 </div>
+                            </div>
+                            <div class="form-row">
                                 <div class="form-group">
                                     <label for="incomeDate">Дата</label>
                                     <input
@@ -633,7 +831,11 @@
                     </div>
 
                     <div class="transactions-section">
-                        <h2 class="section-header">Последние транзакции</h2>
+                        <div class="section-header">
+                            <h2>
+                                <i class="fas fa-list"></i> Последние транзакции
+                            </h2>
+                        </div>
                         <div class="transaction-lists">
                             <div class="transaction-list-section">
                                 <div class="list-header">
@@ -648,7 +850,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="transaction-list-section">
                                 <div class="list-header expense">
                                     <h3>
@@ -668,24 +869,53 @@
 
                 <div>
                     <div class="chart-container">
-                        <h3>
-                            <i class="fas fa-chart-pie"></i> Распределение по
-                            категориям
-                        </h3>
+                        <div class="chart-header">
+                            <h3>
+                                <i class="fas fa-chart-pie"></i> Распределение
+                                по категориям
+                            </h3>
+                        </div>
                         <canvas id="categoryChart"></canvas>
                     </div>
 
                     <div class="chart-container">
-                        <h3>
-                            <i class="fas fa-chart-line"></i> Динамика финансов
-                        </h3>
+                        <div class="chart-header">
+                            <h3>
+                                <i class="fas fa-chart-line"></i> Динамика
+                                финансов
+                            </h3>
+                            <div class="chart-controls">
+                                <select id="trendPeriod" class="control-select">
+                                    <option value="month">
+                                        Последний месяц
+                                    </option>
+                                    <option value="3months">
+                                        Последние 3 месяца
+                                    </option>
+                                    <option value="6months">
+                                        Последние 6 месяцев
+                                    </option>
+                                    <option value="year">Последний год</option>
+                                    <option value="all">Все время</option>
+                                </select>
+                            </div>
+                        </div>
                         <canvas id="trendChart"></canvas>
                     </div>
                 </div>
             </div>
 
             <div class="chart-container">
-                <h3><i class="fas fa-calendar-alt"></i> Траты по дням</h3>
+                <div class="chart-header">
+                    <h3><i class="fas fa-calendar-alt"></i> Траты по дням</h3>
+                    <div class="chart-controls">
+                        <select id="dailyPeriod" class="control-select">
+                            <option value="7days">Последние 7 дней</option>
+                            <option value="14days">Последние 14 дней</option>
+                            <option value="30days">Последние 30 дней</option>
+                        </select>
+                    </div>
+                </div>
                 <canvas id="dailyChart"></canvas>
             </div>
         </div>
@@ -700,23 +930,19 @@
                     this.version = 1
                     this.db = null
                 }
-
                 async init() {
                     return new Promise((resolve, reject) => {
                         const request = indexedDB.open(
                             this.dbName,
                             this.version,
                         )
-
                         request.onerror = () => reject(request.error)
                         request.onsuccess = () => {
                             this.db = request.result
                             resolve(this.db)
                         }
-
                         request.onupgradeneeded = (event) => {
                             const db = event.target.result
-
                             // Создаем хранилище для транзакций
                             if (!db.objectStoreNames.contains('transactions')) {
                                 const store = db.createObjectStore(
@@ -733,7 +959,6 @@
                                     unique: false,
                                 })
                             }
-
                             // Создаем хранилище для настроек
                             if (!db.objectStoreNames.contains('settings')) {
                                 const settingsStore = db.createObjectStore(
@@ -744,7 +969,6 @@
                         }
                     })
                 }
-
                 async addTransaction(transaction) {
                     const transactionObj = this.db.transaction(
                         ['transactions'],
@@ -757,7 +981,6 @@
                         request.onerror = () => reject(request.error)
                     })
                 }
-
                 async getTransactions() {
                     const transactionObj = this.db.transaction(
                         ['transactions'],
@@ -770,7 +993,6 @@
                         request.onerror = () => reject(request.error)
                     })
                 }
-
                 async deleteTransaction(id) {
                     const transactionObj = this.db.transaction(
                         ['transactions'],
@@ -783,7 +1005,6 @@
                         request.onerror = () => reject(request.error)
                     })
                 }
-
                 async saveSetting(key, value) {
                     const transactionObj = this.db.transaction(
                         ['settings'],
@@ -796,7 +1017,6 @@
                         request.onerror = () => reject(request.error)
                     })
                 }
-
                 async getSetting(key) {
                     const transactionObj = this.db.transaction(
                         ['settings'],
@@ -824,9 +1044,10 @@
                     this.trendChart = null
                     this.dailyChart = null
                     this.currentTab = 'income'
+                    this.trendPeriod = 'month'
+                    this.dailyPeriod = '7days'
                     this.init()
                 }
-
                 async init() {
                     await this.db.init()
                     await this.loadTransactions()
@@ -837,7 +1058,6 @@
                     this.updateDashboard()
                     this.initCharts()
                 }
-
                 setupEventListeners() {
                     // Переключение вкладок
                     document.querySelectorAll('.tab').forEach((tab) => {
@@ -852,11 +1072,17 @@
                         .addEventListener('click', () => {
                             this.addIncome()
                         })
-
                     document
                         .getElementById('addExpenseBtn')
                         .addEventListener('click', () => {
                             this.addExpense()
+                        })
+
+                    // Сохранение бюджета
+                    document
+                        .getElementById('saveBudgetBtn')
+                        .addEventListener('click', () => {
+                            this.saveBudget()
                         })
 
                     // Быстрые суммы
@@ -879,17 +1105,29 @@
                         .addEventListener('input', (e) => {
                             this.formatAmountInput(e.target)
                         })
-
                     document
                         .getElementById('expenseAmount')
                         .addEventListener('input', (e) => {
                             this.formatAmountInput(e.target)
                         })
-                }
 
+                    // Изменение периода графиков
+                    document
+                        .getElementById('trendPeriod')
+                        .addEventListener('change', (e) => {
+                            this.trendPeriod = e.target.value
+                            this.updateCharts()
+                        })
+
+                    document
+                        .getElementById('dailyPeriod')
+                        .addEventListener('change', (e) => {
+                            this.dailyPeriod = e.target.value
+                            this.updateCharts()
+                        })
+                }
                 switchTab(tab) {
                     this.currentTab = tab
-
                     // Обновляем активные вкладки
                     document.querySelectorAll('.tab').forEach((t) => {
                         t.classList.remove('active')
@@ -897,14 +1135,12 @@
                     document
                         .querySelector(`[data-tab="${tab}"]`)
                         .classList.add('active')
-
                     // Показываем нужную форму
                     document.getElementById('incomeForm').style.display =
                         tab === 'income' ? 'block' : 'none'
                     document.getElementById('expenseForm').style.display =
                         tab === 'expense' ? 'block' : 'none'
                 }
-
                 formatAmountInput(input) {
                     let value = input.value.replace(/[^\d,]/g, '')
                     if (value.includes(',')) {
@@ -915,17 +1151,14 @@
                     }
                     input.value = value
                 }
-
                 parseAmount(value) {
                     return parseFloat(value.replace(',', '.'))
                 }
-
                 setupDateInputs() {
                     const today = new Date().toISOString().split('T')[0]
                     document.getElementById('incomeDate').value = today
                     document.getElementById('expenseDate').value = today
                 }
-
                 async addIncome() {
                     const amount = this.parseAmount(
                         document.getElementById('incomeAmount').value,
@@ -933,7 +1166,6 @@
                     const category =
                         document.getElementById('incomeCategory').value
                     const date = document.getElementById('incomeDate').value
-
                     if (!amount || !category || !date) {
                         this.showNotification(
                             'Пожалуйста, заполните все поля',
@@ -941,7 +1173,6 @@
                         )
                         return
                     }
-
                     const transaction = {
                         id: Date.now(),
                         amount,
@@ -949,7 +1180,6 @@
                         category,
                         date,
                     }
-
                     try {
                         await this.db.addTransaction(transaction)
                         this.transactions.unshift(transaction)
@@ -966,7 +1196,6 @@
                         console.error('Error adding income:', error)
                     }
                 }
-
                 async addExpense() {
                     const description =
                         document.getElementById('expenseDescription').value
@@ -976,7 +1205,6 @@
                     const category =
                         document.getElementById('expenseCategory').value
                     const date = document.getElementById('expenseDate').value
-
                     if (!description || !amount || !category || !date) {
                         this.showNotification(
                             'Пожалуйста, заполните все поля',
@@ -984,7 +1212,6 @@
                         )
                         return
                     }
-
                     const transaction = {
                         id: Date.now(),
                         description,
@@ -993,7 +1220,6 @@
                         category,
                         date,
                     }
-
                     try {
                         await this.db.addTransaction(transaction)
                         this.transactions.unshift(transaction)
@@ -1010,21 +1236,17 @@
                         console.error('Error adding expense:', error)
                     }
                 }
-
                 resetIncomeForm() {
-                    document.getElementById('incomeDescription').value = ''
                     document.getElementById('incomeAmount').value = ''
                     document.getElementById('incomeCategory').value = 'salary'
                     this.setupDateInputs()
                 }
-
                 resetExpenseForm() {
                     document.getElementById('expenseDescription').value = ''
                     document.getElementById('expenseAmount').value = ''
                     document.getElementById('expenseCategory').value = 'food'
                     this.setupDateInputs()
                 }
-
                 async deleteTransaction(id) {
                     try {
                         await this.db.deleteTransaction(id)
@@ -1043,7 +1265,6 @@
                         console.error('Error deleting transaction:', error)
                     }
                 }
-
                 async loadTransactions() {
                     try {
                         this.transactions = await this.db.getTransactions()
@@ -1052,16 +1273,37 @@
                         this.transactions = []
                     }
                 }
-
                 async loadBudgetSettings() {
                     try {
                         const budget = await this.db.getSetting('budgetLimit')
                         this.budgetLimit = budget ? parseFloat(budget) : 0
+                        document.getElementById('budgetLimitInput').value =
+                            this.budgetLimit
                     } catch (error) {
                         console.error('Error loading budget settings:', error)
                     }
                 }
-
+                async saveBudget() {
+                    const budgetLimit =
+                        parseFloat(
+                            document.getElementById('budgetLimitInput').value,
+                        ) || 0
+                    this.budgetLimit = budgetLimit
+                    try {
+                        await this.db.saveSetting(
+                            'budgetLimit',
+                            budgetLimit.toString(),
+                        )
+                        this.updateDashboard()
+                        this.showNotification('Бюджет сохранен!', 'success')
+                    } catch (error) {
+                        this.showNotification(
+                            'Ошибка при сохранении бюджета',
+                            'error',
+                        )
+                        console.error('Error saving budget:', error)
+                    }
+                }
                 renderTransactions() {
                     const incomeTransactions = this.transactions
                         .filter((t) => t.type === 'income')
@@ -1069,7 +1311,6 @@
                     const expenseTransactions = this.transactions
                         .filter((t) => t.type === 'expense')
                         .slice(0, 10)
-
                     this.renderTransactionList(
                         incomeTransactions,
                         'incomeList',
@@ -1081,10 +1322,8 @@
                         'расходов',
                     )
                 }
-
                 renderTransactionList(transactions, containerId, emptyMessage) {
                     const container = document.getElementById(containerId)
-
                     if (transactions.length === 0) {
                         container.innerHTML = `
                         <div class="empty-state">
@@ -1094,47 +1333,43 @@
                     `
                         return
                     }
-
                     container.innerHTML = transactions
                         .map(
                             (transaction) => `
-                    <div class="transaction-item">
-                        <div class="transaction-info">
-                            <div class="transaction-title">${
-                                transaction.description
-                            }</div>
-                            <div class="transaction-category">${this.getCategoryName(
-                                transaction.category,
-                            )}</div>
-                            <div class="transaction-date">${this.formatDate(
-                                transaction.date,
-                            )}</div>
+                        <div class="transaction-item">
+                            <div class="transaction-info">
+                                <div class="transaction-title">${
+                                    transaction.description || 'Без описания'
+                                }</div>
+                                <div class="transaction-category">${this.getCategoryName(
+                                    transaction.category,
+                                )}</div>
+                                <div class="transaction-date">${this.formatDate(
+                                    transaction.date,
+                                )}</div>
+                            </div>
+                            <div class="transaction-amount amount-${
+                                transaction.type
+                            }">
+                                ${transaction.amount.toFixed(2)} ₽
+                            </div>
+                            <button class="delete-btn" onclick="tracker.deleteTransaction(${
+                                transaction.id
+                            })">
+                                <i class="fas fa-trash"></i>
+                            </button>
                         </div>
-                        <div class="transaction-amount amount-${
-                            transaction.type
-                        }">
-                            ${transaction.amount.toFixed(2)} ₽
-                        </div>
-                        <button class="delete-btn" onclick="tracker.deleteTransaction(${
-                            transaction.id
-                        })">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                `,
+                    `,
                         )
                         .join('')
                 }
-
                 updateDashboard() {
                     const totalIncome = this.transactions
                         .filter((t) => t.type === 'income')
                         .reduce((sum, t) => sum + t.amount, 0)
-
                     const totalExpense = this.transactions
                         .filter((t) => t.type === 'expense')
                         .reduce((sum, t) => sum + t.amount, 0)
-
                     const balance = totalIncome - totalExpense
                     const budgetUsage =
                         this.budgetLimit > 0
@@ -1154,8 +1389,22 @@
                         budgetUsage.toFixed(0) + '%'
                     document.getElementById('budgetProgress').style.width =
                         budgetUsage + '%'
-                }
+                    document.getElementById('budgetUsed').textContent =
+                        totalExpense.toFixed(2)
+                    document.getElementById('budgetLimitValue').textContent =
+                        this.budgetLimit.toFixed(2)
 
+                    // Цвет индикатора бюджета
+                    const progressFill =
+                        document.getElementById('budgetProgress')
+                    if (budgetUsage < 50) {
+                        progressFill.style.background = 'var(--success)'
+                    } else if (budgetUsage < 80) {
+                        progressFill.style.background = 'var(--warning)'
+                    } else {
+                        progressFill.style.background = 'var(--danger)'
+                    }
+                }
                 getCategoryName(category) {
                     const categories = {
                         salary: 'Зарплата',
@@ -1172,23 +1421,19 @@
                     }
                     return categories[category] || category
                 }
-
                 formatDate(dateString) {
                     const date = new Date(dateString)
                     return date.toLocaleDateString('ru-RU')
                 }
-
                 initCharts() {
                     this.createCategoryChart()
                     this.createTrendChart()
                     this.createDailyChart()
                 }
-
                 createCategoryChart() {
                     const ctx = document
                         .getElementById('categoryChart')
                         .getContext('2d')
-
                     // Подсчет по категориям
                     const categories = {}
                     this.transactions.forEach((t) => {
@@ -1197,16 +1442,13 @@
                         }
                         categories[t.category] += t.amount
                     })
-
                     const labels = Object.keys(categories).map((cat) =>
                         this.getCategoryName(cat),
                     )
                     const data = Object.values(categories)
-
                     if (this.categoryChart) {
                         this.categoryChart.destroy()
                     }
-
                     this.categoryChart = new Chart(ctx, {
                         type: 'doughnut',
                         data: {
@@ -1215,14 +1457,14 @@
                                 {
                                     data: data,
                                     backgroundColor: [
-                                        '#3498db',
-                                        '#2ecc71',
-                                        '#e74c3c',
-                                        '#f39c12',
-                                        '#9b59b6',
-                                        '#1abc9c',
-                                        '#34495e',
-                                        '#e67e22',
+                                        '#bb86fc',
+                                        '#03dac6',
+                                        '#cf6679',
+                                        '#ffd700',
+                                        '#00c853',
+                                        '#ff6d00',
+                                        '#6200ea',
+                                        '#00b0ff',
                                     ],
                                     borderWidth: 0,
                                 },
@@ -1233,20 +1475,29 @@
                             plugins: {
                                 legend: {
                                     position: 'bottom',
+                                    labels: {
+                                        color: '#b0b0b0',
+                                        font: {
+                                            size: 12,
+                                        },
+                                    },
                                 },
                             },
                         },
                     })
                 }
-
                 createTrendChart() {
                     const ctx = document
                         .getElementById('trendChart')
                         .getContext('2d')
+                    // Фильтрация по периоду
+                    const filteredTransactions = this.getTransactionsByPeriod(
+                        this.trendPeriod,
+                    )
 
                     // Группировка по месяцам
                     const monthlyData = {}
-                    this.transactions.forEach((t) => {
+                    filteredTransactions.forEach((t) => {
                         const month = new Date(t.date).toLocaleDateString(
                             'ru-RU',
                             {
@@ -1254,11 +1505,9 @@
                                 month: 'short',
                             },
                         )
-
                         if (!monthlyData[month]) {
                             monthlyData[month] = {income: 0, expense: 0}
                         }
-
                         monthlyData[month][t.type] += t.amount
                     })
 
@@ -1280,16 +1529,16 @@
                                 {
                                     label: 'Доходы',
                                     data: incomeData,
-                                    borderColor: '#27ae60',
-                                    backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                                    borderColor: '#00c853',
+                                    backgroundColor: 'rgba(0, 200, 83, 0.1)',
                                     tension: 0.4,
                                     fill: true,
                                 },
                                 {
                                     label: 'Расходы',
                                     data: expenseData,
-                                    borderColor: '#e74c3c',
-                                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                                    borderColor: '#cf6679',
+                                    backgroundColor: 'rgba(207, 102, 121, 0.1)',
                                     tension: 0.4,
                                     fill: true,
                                 },
@@ -1300,26 +1549,49 @@
                             plugins: {
                                 legend: {
                                     position: 'top',
+                                    labels: {
+                                        color: '#b0b0b0',
+                                    },
                                 },
                             },
                             scales: {
                                 y: {
                                     beginAtZero: true,
+                                    grid: {
+                                        color: 'rgba(255, 255, 255, 0.05)',
+                                    },
+                                    ticks: {
+                                        color: '#b0b0b0',
+                                    },
+                                },
+                                x: {
+                                    grid: {
+                                        color: 'rgba(255, 255, 255, 0.05)',
+                                    },
+                                    ticks: {
+                                        color: '#b0b0b0',
+                                    },
                                 },
                             },
                         },
                     })
                 }
-
                 createDailyChart() {
                     const ctx = document
                         .getElementById('dailyChart')
                         .getContext('2d')
+                    // Фильтрация по периоду
+                    const daysCount =
+                        this.dailyPeriod === '7days'
+                            ? 7
+                            : this.dailyPeriod === '14days'
+                            ? 14
+                            : 30
 
-                    // Группировка по дням (последние 7 дней)
+                    // Группировка по дням
                     const dailyData = {}
                     const today = new Date()
-                    for (let i = 6; i >= 0; i--) {
+                    for (let i = daysCount - 1; i >= 0; i--) {
                         const date = new Date(today)
                         date.setDate(date.getDate() - i)
                         const dateStr = date.toLocaleDateString('ru-RU')
@@ -1350,7 +1622,7 @@
                                 {
                                     label: 'Расходы',
                                     data: expenseData,
-                                    backgroundColor: '#e74c3c',
+                                    backgroundColor: '#cf6679',
                                     borderRadius: 4,
                                 },
                             ],
@@ -1365,23 +1637,59 @@
                             scales: {
                                 y: {
                                     beginAtZero: true,
+                                    grid: {
+                                        color: 'rgba(255, 255, 255, 0.05)',
+                                    },
+                                    ticks: {
+                                        color: '#b0b0b0',
+                                    },
+                                },
+                                x: {
+                                    grid: {
+                                        color: 'rgba(255, 255, 255, 0.05)',
+                                    },
+                                    ticks: {
+                                        color: '#b0b0b0',
+                                    },
                                 },
                             },
                         },
                     })
                 }
+                getTransactionsByPeriod(period) {
+                    const now = new Date()
+                    let startDate = new Date()
 
+                    switch (period) {
+                        case 'month':
+                            startDate.setMonth(now.getMonth() - 1)
+                            break
+                        case '3months':
+                            startDate.setMonth(now.getMonth() - 3)
+                            break
+                        case '6months':
+                            startDate.setMonth(now.getMonth() - 6)
+                            break
+                        case 'year':
+                            startDate.setFullYear(now.getFullYear() - 1)
+                            break
+                        case 'all':
+                            return this.transactions
+                    }
+
+                    return this.transactions.filter(
+                        (t) => new Date(t.date) >= startDate,
+                    )
+                }
                 updateCharts() {
                     this.createCategoryChart()
                     this.createTrendChart()
                     this.createDailyChart()
                 }
-
                 showNotification(message, type) {
                     const notification = document.getElementById('notification')
                     notification.textContent = message
                     notification.className = `notification ${type} show`
-
                     setTimeout(() => {
                         notification.classList.remove('show')
                     }, 3000)
