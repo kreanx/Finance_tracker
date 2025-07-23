@@ -9,6 +9,7 @@
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
         />
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
         <style>
             :root {
                 --bg-primary: #121212;
@@ -91,10 +92,6 @@
 
             .stat-card.balance {
                 border-left: 4px solid var(--accent-primary);
-            }
-
-            .stat-card.budget {
-                border-left: 4px solid var(--warning);
             }
 
             .stat-card h3 {
@@ -227,6 +224,15 @@
 
             .btn-expense:hover {
                 background: #ff7997;
+            }
+
+            .btn-secondary {
+                background: rgba(255, 255, 255, 0.1);
+                color: var(--text-primary);
+            }
+
+            .btn-secondary:hover {
+                background: rgba(255, 255, 255, 0.2);
             }
 
             .quick-amounts {
@@ -379,21 +385,32 @@
                 color: var(--danger);
             }
 
-            .delete-btn {
+            .transaction-actions {
+                display: flex;
+                gap: 5px;
+            }
+
+            .action-btn {
                 background: none;
                 border: none;
                 color: var(--text-secondary);
                 cursor: pointer;
                 font-size: 1rem;
-                margin-left: 10px;
                 transition: var(--transition);
                 padding: 5px;
                 border-radius: 4px;
             }
 
+            .action-btn:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .edit-btn:hover {
+                color: var(--accent-primary);
+            }
+
             .delete-btn:hover {
                 color: var(--danger);
-                background: rgba(207, 102, 121, 0.1);
             }
 
             .empty-state {
@@ -479,6 +496,11 @@
                 border-color: var(--danger);
             }
 
+            .notification.info {
+                background: rgba(3, 218, 198, 0.2);
+                border-color: var(--accent-secondary);
+            }
+
             .tabs {
                 display: flex;
                 gap: 10px;
@@ -506,31 +528,106 @@
                 background: rgba(255, 255, 255, 0.1);
             }
 
-            .budget-progress {
+            /* Модальное окно */
+            .modal {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.7);
+                z-index: 1001;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .modal-content {
+                background: var(--bg-card);
+                border-radius: var(--border-radius);
+                padding: 30px;
+                width: 90%;
+                max-width: 500px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .modal-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+
+            .modal-header h3 {
+                font-weight: 400;
+                font-size: 1.4rem;
+                color: var(--text-primary);
+            }
+
+            .close-modal {
+                background: none;
+                border: none;
+                color: var(--text-secondary);
+                font-size: 1.5rem;
+                cursor: pointer;
+                transition: var(--transition);
+            }
+
+            .close-modal:hover {
+                color: var(--danger);
+            }
+
+            .modal-actions {
+                display: flex;
+                gap: 10px;
+                margin-top: 20px;
+            }
+
+            .file-drop-area {
+                border: 2px dashed rgba(255, 255, 255, 0.2);
+                border-radius: 8px;
+                padding: 30px;
+                text-align: center;
+                transition: var(--transition);
+                margin-bottom: 20px;
+                cursor: pointer;
+            }
+
+            .file-drop-area:hover,
+            .file-drop-area.dragover {
+                border-color: var(--accent-primary);
+                background: rgba(187, 134, 252, 0.05);
+            }
+
+            .file-drop-area i {
+                font-size: 2.5rem;
+                color: var(--accent-primary);
+                margin-bottom: 15px;
+            }
+
+            .file-input {
+                display: none;
+            }
+
+            .import-progress {
+                margin-top: 20px;
+            }
+
+            .progress-bar {
                 height: 8px;
                 background: rgba(255, 255, 255, 0.05);
                 border-radius: 4px;
-                margin-top: 10px;
                 overflow: hidden;
+                margin-top: 10px;
             }
 
-            .budget-progress-fill {
+            .progress-fill {
                 height: 100%;
                 width: 0%;
-                background: var(--warning);
+                background: var(--accent-primary);
                 border-radius: 4px;
-                transition: width 0.5s ease;
-            }
-
-            .budget-info {
-                font-size: 0.85rem;
-                color: var(--text-secondary);
-                margin-top: 8px;
-            }
-
-            .budget-info span {
-                color: var(--text-primary);
-                font-weight: 500;
+                transition: width 0.3s ease;
             }
 
             /* Адаптивность для мобильных устройств */
@@ -580,6 +677,11 @@
                 .chart-controls {
                     width: 100%;
                 }
+
+                .modal-content {
+                    width: 95%;
+                    padding: 20px;
+                }
             }
 
             @media (max-width: 480px) {
@@ -616,21 +718,6 @@
                     <h3 id="balance">0 ₽</h3>
                     <p>Баланс</p>
                 </div>
-                <div class="card stat-card budget">
-                    <h3 id="budgetUsage">0%</h3>
-                    <p>Бюджет</p>
-                    <div class="budget-progress">
-                        <div
-                            id="budgetProgress"
-                            class="budget-progress-fill"
-                            style="width: 0%"
-                        ></div>
-                    </div>
-                    <div class="budget-info">
-                        Использовано: <span id="budgetUsed">0</span> из
-                        <span id="budgetLimitValue">0</span> ₽
-                    </div>
-                </div>
             </div>
 
             <div class="main-content">
@@ -642,15 +729,12 @@
                                 транзакцию
                             </h2>
                             <div class="form-controls">
-                                <input
-                                    type="number"
-                                    id="budgetLimitInput"
-                                    class="form-control"
-                                    placeholder="Лимит бюджета"
-                                    min="0"
-                                />
-                                <button id="saveBudgetBtn" class="btn">
-                                    <i class="fas fa-save"></i> Сохранить бюджет
+                                <button
+                                    id="importBtn"
+                                    class="btn btn-secondary"
+                                >
+                                    <i class="fas fa-file-import"></i> Импорт из
+                                    Excel
                                 </button>
                             </div>
                         </div>
@@ -872,7 +956,7 @@
                         <div class="chart-header">
                             <h3>
                                 <i class="fas fa-chart-pie"></i> Распределение
-                                по категориям
+                                по категориям (Расходы)
                             </h3>
                         </div>
                         <canvas id="categoryChart"></canvas>
@@ -920,6 +1004,102 @@
             </div>
         </div>
 
+        <!-- Модальное окно для импорта -->
+        <div class="modal" id="importModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>
+                        <i class="fas fa-file-import"></i> Импорт транзакций
+                    </h3>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="file-drop-area" id="dropArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3>Перетащите файл Excel сюда</h3>
+                    <p>или</p>
+                    <button class="btn btn-secondary" id="browseBtn">
+                        <i class="fas fa-folder-open"></i> Выбрать файл
+                    </button>
+                    <input
+                        type="file"
+                        id="fileInput"
+                        class="file-input"
+                        accept=".xls,.xlsx"
+                    />
+                </div>
+                <div
+                    class="import-progress"
+                    id="importProgress"
+                    style="display: none"
+                >
+                    <p>Импорт данных... <span id="importStatus"></span></p>
+                    <div class="progress-bar">
+                        <div
+                            class="progress-fill"
+                            id="progressFill"
+                            style="width: 0%"
+                        ></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно для редактирования -->
+        <div class="modal" id="editModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>
+                        <i class="fas fa-edit"></i> Редактировать транзакцию
+                    </h3>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <form id="editForm">
+                    <input type="hidden" id="editId" />
+                    <div class="form-group">
+                        <label for="editDescription">Описание</label>
+                        <input
+                            type="text"
+                            id="editDescription"
+                            class="form-control"
+                        />
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editAmount">Сумма (₽)</label>
+                            <input
+                                type="text"
+                                id="editAmount"
+                                class="form-control"
+                            />
+                        </div>
+                        <div class="form-group">
+                            <label for="editCategory">Категория</label>
+                            <select
+                                id="editCategory"
+                                class="form-control"
+                            ></select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editDate">Дата</label>
+                        <input type="date" id="editDate" class="form-control" />
+                    </div>
+                    <div class="modal-actions">
+                        <button type="submit" class="btn">
+                            <i class="fas fa-save"></i> Сохранить
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            id="cancelEdit"
+                        >
+                            <i class="fas fa-times"></i> Отмена
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <div class="notification" id="notification"></div>
 
         <script>
@@ -959,13 +1139,6 @@
                                     unique: false,
                                 })
                             }
-                            // Создаем хранилище для настроек
-                            if (!db.objectStoreNames.contains('settings')) {
-                                const settingsStore = db.createObjectStore(
-                                    'settings',
-                                    {keyPath: 'key'},
-                                )
-                            }
                         }
                     })
                 }
@@ -977,6 +1150,18 @@
                     const store = transactionObj.objectStore('transactions')
                     return new Promise((resolve, reject) => {
                         const request = store.add(transaction)
+                        request.onsuccess = () => resolve(request.result)
+                        request.onerror = () => reject(request.error)
+                    })
+                }
+                async updateTransaction(transaction) {
+                    const transactionObj = this.db.transaction(
+                        ['transactions'],
+                        'readwrite',
+                    )
+                    const store = transactionObj.objectStore('transactions')
+                    return new Promise((resolve, reject) => {
+                        const request = store.put(transaction)
                         request.onsuccess = () => resolve(request.result)
                         request.onerror = () => reject(request.error)
                     })
@@ -1005,33 +1190,6 @@
                         request.onerror = () => reject(request.error)
                     })
                 }
-                async saveSetting(key, value) {
-                    const transactionObj = this.db.transaction(
-                        ['settings'],
-                        'readwrite',
-                    )
-                    const store = transactionObj.objectStore('settings')
-                    return new Promise((resolve, reject) => {
-                        const request = store.put({key, value})
-                        request.onsuccess = () => resolve()
-                        request.onerror = () => reject(request.error)
-                    })
-                }
-                async getSetting(key) {
-                    const transactionObj = this.db.transaction(
-                        ['settings'],
-                        'readonly',
-                    )
-                    const store = transactionObj.objectStore('settings')
-                    return new Promise((resolve, reject) => {
-                        const request = store.get(key)
-                        request.onsuccess = () =>
-                            resolve(
-                                request.result ? request.result.value : null,
-                            )
-                        request.onerror = () => reject(request.error)
-                    })
-                }
             }
 
             // Финансовый трекер
@@ -1039,7 +1197,6 @@
                 constructor() {
                     this.db = new FinanceDB()
                     this.transactions = []
-                    this.budgetLimit = 0
                     this.categoryChart = null
                     this.trendChart = null
                     this.dailyChart = null
@@ -1051,7 +1208,6 @@
                 async init() {
                     await this.db.init()
                     await this.loadTransactions()
-                    await this.loadBudgetSettings()
                     this.setupEventListeners()
                     this.setupDateInputs()
                     this.renderTransactions()
@@ -1078,11 +1234,74 @@
                             this.addExpense()
                         })
 
-                    // Сохранение бюджета
+                    // Импорт данных
                     document
-                        .getElementById('saveBudgetBtn')
+                        .getElementById('importBtn')
                         .addEventListener('click', () => {
-                            this.saveBudget()
+                            document.getElementById(
+                                'importModal',
+                            ).style.display = 'flex'
+                        })
+
+                    // Закрытие модальных окон
+                    document
+                        .querySelectorAll('.close-modal')
+                        .forEach((button) => {
+                            button.addEventListener('click', () => {
+                                document.getElementById(
+                                    'importModal',
+                                ).style.display = 'none'
+                                document.getElementById(
+                                    'editModal',
+                                ).style.display = 'none'
+                            })
+                        })
+
+                    document
+                        .getElementById('cancelEdit')
+                        .addEventListener('click', () => {
+                            document.getElementById('editModal').style.display =
+                                'none'
+                        })
+
+                    // Выбор файла
+                    document
+                        .getElementById('browseBtn')
+                        .addEventListener('click', () => {
+                            document.getElementById('fileInput').click()
+                        })
+
+                    document
+                        .getElementById('fileInput')
+                        .addEventListener('change', (e) => {
+                            if (e.target.files.length > 0) {
+                                this.importFromFile(e.target.files[0])
+                            }
+                        })
+
+                    // Drag and drop
+                    const dropArea = document.getElementById('dropArea')
+                    dropArea.addEventListener('dragover', (e) => {
+                        e.preventDefault()
+                        dropArea.classList.add('dragover')
+                    })
+                    dropArea.addEventListener('dragleave', () => {
+                        dropArea.classList.remove('dragover')
+                    })
+                    dropArea.addEventListener('drop', (e) => {
+                        e.preventDefault()
+                        dropArea.classList.remove('dragover')
+                        if (e.dataTransfer.files.length > 0) {
+                            this.importFromFile(e.dataTransfer.files[0])
+                        }
+                    })
+
+                    // Редактирование формы
+                    document
+                        .getElementById('editForm')
+                        .addEventListener('submit', (e) => {
+                            e.preventDefault()
+                            this.updateTransaction()
                         })
 
                     // Быстрые суммы
@@ -1107,6 +1326,11 @@
                         })
                     document
                         .getElementById('expenseAmount')
+                        .addEventListener('input', (e) => {
+                            this.formatAmountInput(e.target)
+                        })
+                    document
+                        .getElementById('editAmount')
                         .addEventListener('input', (e) => {
                             this.formatAmountInput(e.target)
                         })
@@ -1248,6 +1472,12 @@
                     this.setupDateInputs()
                 }
                 async deleteTransaction(id) {
+                    if (
+                        !confirm(
+                            'Вы уверены, что хотите удалить эту транзакцию?',
+                        )
+                    )
+                        return
                     try {
                         await this.db.deleteTransaction(id)
                         this.transactions = this.transactions.filter(
@@ -1271,37 +1501,6 @@
                     } catch (error) {
                         console.error('Error loading transactions:', error)
                         this.transactions = []
-                    }
-                }
-                async loadBudgetSettings() {
-                    try {
-                        const budget = await this.db.getSetting('budgetLimit')
-                        this.budgetLimit = budget ? parseFloat(budget) : 0
-                        document.getElementById('budgetLimitInput').value =
-                            this.budgetLimit
-                    } catch (error) {
-                        console.error('Error loading budget settings:', error)
-                    }
-                }
-                async saveBudget() {
-                    const budgetLimit =
-                        parseFloat(
-                            document.getElementById('budgetLimitInput').value,
-                        ) || 0
-                    this.budgetLimit = budgetLimit
-                    try {
-                        await this.db.saveSetting(
-                            'budgetLimit',
-                            budgetLimit.toString(),
-                        )
-                        this.updateDashboard()
-                        this.showNotification('Бюджет сохранен!', 'success')
-                    } catch (error) {
-                        this.showNotification(
-                            'Ошибка при сохранении бюджета',
-                            'error',
-                        )
-                        console.error('Error saving budget:', error)
                     }
                 }
                 renderTransactions() {
@@ -1353,11 +1552,18 @@
                             }">
                                 ${transaction.amount.toFixed(2)} ₽
                             </div>
-                            <button class="delete-btn" onclick="tracker.deleteTransaction(${
-                                transaction.id
-                            })">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                            <div class="transaction-actions">
+                                <button class="action-btn edit-btn" onclick="tracker.openEditModal(${
+                                    transaction.id
+                                })">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-btn" onclick="tracker.deleteTransaction(${
+                                    transaction.id
+                                })">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
                     `,
                         )
@@ -1371,13 +1577,6 @@
                         .filter((t) => t.type === 'expense')
                         .reduce((sum, t) => sum + t.amount, 0)
                     const balance = totalIncome - totalExpense
-                    const budgetUsage =
-                        this.budgetLimit > 0
-                            ? Math.min(
-                                  (totalExpense / this.budgetLimit) * 100,
-                                  100,
-                              )
-                            : 0
 
                     document.getElementById('totalIncome').textContent =
                         totalIncome.toFixed(2) + ' ₽'
@@ -1385,25 +1584,6 @@
                         totalExpense.toFixed(2) + ' ₽'
                     document.getElementById('balance').textContent =
                         balance.toFixed(2) + ' ₽'
-                    document.getElementById('budgetUsage').textContent =
-                        budgetUsage.toFixed(0) + '%'
-                    document.getElementById('budgetProgress').style.width =
-                        budgetUsage + '%'
-                    document.getElementById('budgetUsed').textContent =
-                        totalExpense.toFixed(2)
-                    document.getElementById('budgetLimitValue').textContent =
-                        this.budgetLimit.toFixed(2)
-
-                    // Цвет индикатора бюджета
-                    const progressFill =
-                        document.getElementById('budgetProgress')
-                    if (budgetUsage < 50) {
-                        progressFill.style.background = 'var(--success)'
-                    } else if (budgetUsage < 80) {
-                        progressFill.style.background = 'var(--warning)'
-                    } else {
-                        progressFill.style.background = 'var(--danger)'
-                    }
                 }
                 getCategoryName(category) {
                     const categories = {
@@ -1434,14 +1614,16 @@
                     const ctx = document
                         .getElementById('categoryChart')
                         .getContext('2d')
-                    // Подсчет по категориям
+                    // Подсчет только по расходам
                     const categories = {}
-                    this.transactions.forEach((t) => {
-                        if (!categories[t.category]) {
-                            categories[t.category] = 0
-                        }
-                        categories[t.category] += t.amount
-                    })
+                    this.transactions
+                        .filter((t) => t.type === 'expense')
+                        .forEach((t) => {
+                            if (!categories[t.category]) {
+                                categories[t.category] = 0
+                            }
+                            categories[t.category] += t.amount
+                        })
                     const labels = Object.keys(categories).map((cat) =>
                         this.getCategoryName(cat),
                     )
@@ -1455,7 +1637,7 @@
                             labels: labels,
                             datasets: [
                                 {
-                                    data: data,
+                                    data,
                                     backgroundColor: [
                                         '#bb86fc',
                                         '#03dac6',
@@ -1536,7 +1718,7 @@
                                 },
                                 {
                                     label: 'Расходы',
-                                    data: expenseData,
+                                    expenseData,
                                     borderColor: '#cf6679',
                                     backgroundColor: 'rgba(207, 102, 121, 0.1)',
                                     tension: 0.4,
@@ -1693,6 +1875,469 @@
                     setTimeout(() => {
                         notification.classList.remove('show')
                     }, 3000)
+                }
+                // Импорт из Excel
+                async importFromFile(file) {
+                    if (!file.name.match(/\.(xls|xlsx)$/)) {
+                        this.showNotification(
+                            'Пожалуйста, выберите файл Excel (.xls или .xlsx)',
+                            'error',
+                        )
+                        return
+                    }
+
+                    const importProgress =
+                        document.getElementById('importProgress')
+                    const importStatus = document.getElementById('importStatus')
+                    const progressFill = document.getElementById('progressFill')
+
+                    importProgress.style.display = 'block'
+                    importStatus.textContent = '0%'
+                    progressFill.style.width = '0%'
+
+                    try {
+                        // Чтение файла
+                        const data = await new Promise((resolve, reject) => {
+                            const reader = new FileReader()
+                            reader.onload = (e) => resolve(e.target.result)
+                            reader.onerror = reject
+                            reader.readAsArrayBuffer(file)
+                        })
+
+                        // Парсинг Excel файла
+                        const workbook = XLSX.read(data, {type: 'array'})
+                        const firstSheetName = workbook.SheetNames[0]
+                        const worksheet = workbook.Sheets[firstSheetName]
+
+                        // Преобразование в JSON
+                        const jsonData = XLSX.utils.sheet_to_json(worksheet, {
+                            header: 1,
+                        })
+
+                        if (jsonData.length < 2) {
+                            throw new Error(
+                                'Файл пуст или содержит недостаточно данных',
+                            )
+                        }
+
+                        // Определение заголовков (первые 2 строки могут быть заголовками)
+                        let headersRow = 0
+                        let headers = []
+
+                        // Поиск строки с заголовками (ищем дату в первом столбце)
+                        for (let i = 0; i < Math.min(3, jsonData.length); i++) {
+                            if (
+                                jsonData[i][0] &&
+                                jsonData[i][0]
+                                    .toString()
+                                    .match(/^\d{4}-\d{2}-\d{2}/)
+                            ) {
+                                headersRow = i - 1
+                                break
+                            }
+                        }
+
+                        if (headersRow >= 0 && jsonData[headersRow]) {
+                            headers = jsonData[headersRow].map((h) =>
+                                h ? h.toString().trim() : '',
+                            )
+                        } else {
+                            // Если не нашли заголовки, используем стандартные
+                            headers = [
+                                'Дата проведения операции',
+                                'Оператор',
+                                'Категория',
+                                'Тип операции',
+                                'Сумма',
+                            ]
+                        }
+
+                        // Индексы колонок
+                        const dateIndex = headers.findIndex((h) =>
+                            h.includes('Дата'),
+                        )
+                        const operatorIndex = headers.findIndex((h) =>
+                            h.includes('Оператор'),
+                        )
+                        const categoryIndex = headers.findIndex((h) =>
+                            h.includes('Категория'),
+                        )
+                        const typeIndex = headers.findIndex(
+                            (h) => h.includes('Тип') || h.includes('операции'),
+                        )
+                        const amountIndex = headers.findIndex((h) =>
+                            h.includes('Сумма'),
+                        )
+
+                        if (
+                            dateIndex === -1 ||
+                            operatorIndex === -1 ||
+                            amountIndex === -1
+                        ) {
+                            throw new Error(
+                                'Не удалось найти необходимые колонки в файле',
+                            )
+                        }
+
+                        // Обработка строк данных
+                        let transactions = []
+                        const totalRows = jsonData.length - (headersRow + 1)
+                        let processedRows = 0
+
+                        for (let i = headersRow + 1; i < jsonData.length; i++) {
+                            const row = jsonData[i]
+                            if (!row || row.length === 0) continue
+
+                            const dateCell = row[dateIndex]
+                            if (!dateCell) continue
+
+                            // Проверка формата даты
+                            let dateStr = dateCell.toString()
+                            if (!dateStr.match(/^\d{4}-\d{2}-\d{2}/)) continue
+
+                            const operator = row[operatorIndex]
+                                ? row[operatorIndex].toString().trim()
+                                : ''
+                            const category = row[categoryIndex]
+                                ? row[categoryIndex].toString().trim()
+                                : 'Другое'
+                            const typeRaw = row[3]
+                                ? row[3].toString().trim()
+                                : ''
+                            const amountRaw = row[amountIndex]
+                                ? row[amountIndex]
+                                : 0
+                            // Определение типа операции
+                            let type = 'expense'
+                            if (
+                                typeRaw.includes('Поступление') ||
+                                typeRaw.includes('Приход') ||
+                                typeRaw.includes('Зарплата') ||
+                                typeRaw.includes('зачисл')
+                            ) {
+                                type = 'income'
+                            } else if (
+                                typeRaw.includes('Расход') ||
+                                typeRaw.includes('Списание')
+                            ) {
+                                type = 'expense'
+                            }
+
+                            // Парсинг суммы
+                            let amount = 0
+                            if (typeof amountRaw === 'number') {
+                                amount = Math.abs(amountRaw)
+                            } else {
+                                const amountStr = amountRaw
+                                    .toString()
+                                    .replace(/[^\d.,]/g, '')
+                                    .replace(',', '.')
+                                amount = parseFloat(amountStr) || 0
+                            }
+
+                            if (amount <= 0) continue
+
+                            // Определение категории по оператору
+                            let finalCategory = this.determineCategory(
+                                operator,
+                                category,
+                            )
+
+                            transactions.push({
+                                id: Date.now() + i,
+                                description: operator,
+                                amount: amount,
+                                type: type,
+                                category: finalCategory,
+                                date: dateStr.split('T')[0] || dateStr,
+                            })
+
+                            processedRows++
+
+                            // Обновление прогресса
+                            if (
+                                processedRows % 5 === 0 ||
+                                processedRows === totalRows
+                            ) {
+                                const progress = Math.round(
+                                    (processedRows / totalRows) * 100,
+                                )
+                                importStatus.textContent = `${progress}%`
+                                progressFill.style.width = `${progress}%`
+                                await new Promise((resolve) =>
+                                    setTimeout(resolve, 10),
+                                )
+                            }
+                        }
+
+                        if (transactions.length === 0) {
+                            throw new Error(
+                                'Не удалось найти транзакции в файле',
+                            )
+                        }
+
+                        // Добавление транзакций в базу данных
+                        let addedCount = 0
+                        for (const transaction of transactions) {
+                            try {
+                                await this.db.addTransaction(transaction)
+                                this.transactions.unshift(transaction)
+                                addedCount++
+                            } catch (error) {
+                                console.error(
+                                    'Error adding transaction:',
+                                    error,
+                                )
+                            }
+                        }
+
+                        this.renderTransactions()
+                        this.updateDashboard()
+                        this.updateCharts()
+
+                        document.getElementById('importModal').style.display =
+                            'none'
+                        this.showNotification(
+                            `Импортировано ${addedCount} транзакций`,
+                            'success',
+                        )
+                    } catch (error) {
+                        console.error('Error importing file:', error)
+                        this.showNotification(
+                            `Ошибка при импорте: ${error.message}`,
+                            'error',
+                        )
+                    } finally {
+                        importProgress.style.display = 'none'
+                    }
+                }
+
+                // Вспомогательная функция для определения категории
+                determineCategory(operator, category) {
+                    const operatorLower = operator.toLowerCase()
+
+                    // Категории по оператору
+                    if (
+                        operatorLower.includes('coffee') ||
+                        operatorLower.includes('cafe') ||
+                        operatorLower.includes('ресторан') ||
+                        operatorLower.includes('бар') ||
+                        operatorLower.includes('burger') ||
+                        operatorLower.includes('пицца') ||
+                        operatorLower.includes('суши') ||
+                        operatorLower.includes('kfc') ||
+                        operatorLower.includes('mcdonald') ||
+                        operatorLower.includes('starbucks')
+                    ) {
+                        return 'food'
+                    }
+
+                    if (
+                        operatorLower.includes('taxi') ||
+                        operatorLower.includes('яндекс') ||
+                        operatorLower.includes('uber') ||
+                        operatorLower.includes('bolt') ||
+                        operatorLower.includes('транспорт') ||
+                        operatorLower.includes('метро') ||
+                        operatorLower.includes('автобус')
+                    ) {
+                        return 'transport'
+                    }
+
+                    if (
+                        operatorLower.includes('жилье') ||
+                        operatorLower.includes('аренда') ||
+                        operatorLower.includes('коммунал') ||
+                        operatorLower.includes('ипотека')
+                    ) {
+                        return 'housing'
+                    }
+
+                    if (
+                        operatorLower.includes('развлеч') ||
+                        operatorLower.includes('кино') ||
+                        operatorLower.includes('концерт') ||
+                        operatorLower.includes('театр') ||
+                        operatorLower.includes('игр') ||
+                        operatorLower.includes('парк')
+                    ) {
+                        return 'entertainment'
+                    }
+
+                    if (
+                        operatorLower.includes('аптек') ||
+                        operatorLower.includes('медицина') ||
+                        operatorLower.includes('врач') ||
+                        operatorLower.includes('больниц')
+                    ) {
+                        return 'health'
+                    }
+
+                    if (
+                        operatorLower.includes('магазин') ||
+                        operatorLower.includes('маркет') ||
+                        operatorLower.includes('shop') ||
+                        operatorLower.includes('покупк')
+                    ) {
+                        return 'shopping'
+                    }
+
+                    if (
+                        operatorLower.includes('зарплат') ||
+                        operatorLower.includes('salary') ||
+                        operatorLower.includes('freelance') ||
+                        operatorLower.includes('фриланс')
+                    ) {
+                        return 'salary'
+                    }
+
+                    if (
+                        operatorLower.includes('инвестиц') ||
+                        operatorLower.includes('дивиденд')
+                    ) {
+                        return 'investment'
+                    }
+
+                    if (
+                        operatorLower.includes('подарок') ||
+                        operatorLower.includes('gift')
+                    ) {
+                        return 'gift'
+                    }
+
+                    // Если не нашли по оператору, используем исходную категорию
+                    const categoryMap = {
+                        'Рестораны и кафе': 'food',
+                        Транспорт: 'transport',
+                        Жилье: 'housing',
+                        Развлечения: 'entertainment',
+                        Здоровье: 'health',
+                        Покупки: 'shopping',
+                        Переводы: 'other',
+                        Супермаркеты: 'food',
+                        Аптеки: 'health',
+                        Красота: 'health',
+                        Путешествия: 'entertainment',
+                        Медицина: 'health',
+                        Цветы: 'other',
+                        Прочее: 'other',
+                    }
+
+                    return categoryMap[category] || 'other'
+                }
+                // Редактирование транзакции
+                openEditModal(id) {
+                    const transaction = this.transactions.find(
+                        (t) => t.id === id,
+                    )
+                    if (!transaction) return
+
+                    document.getElementById('editId').value = transaction.id
+                    document.getElementById('editDescription').value =
+                        transaction.description || ''
+                    document.getElementById('editAmount').value =
+                        transaction.amount
+                    document.getElementById('editDate').value = transaction.date
+
+                    // Заполнение категорий
+                    const categorySelect =
+                        document.getElementById('editCategory')
+                    categorySelect.innerHTML = ''
+
+                    if (transaction.type === 'income') {
+                        const incomeCategories = [
+                            {value: 'salary', text: 'Зарплата'},
+                            {value: 'freelance', text: 'Фриланс'},
+                            {value: 'investment', text: 'Инвестиции'},
+                            {value: 'gift', text: 'Подарок'},
+                            {value: 'other', text: 'Другое'},
+                        ]
+                        incomeCategories.forEach((cat) => {
+                            const option = document.createElement('option')
+                            option.value = cat.value
+                            option.textContent = cat.text
+                            if (cat.value === transaction.category)
+                                option.selected = true
+                            categorySelect.appendChild(option)
+                        })
+                    } else {
+                        const expenseCategories = [
+                            {value: 'food', text: 'Еда'},
+                            {value: 'transport', text: 'Транспорт'},
+                            {value: 'housing', text: 'Жилье'},
+                            {value: 'entertainment', text: 'Развлечения'},
+                            {value: 'health', text: 'Здоровье'},
+                            {value: 'shopping', text: 'Покупки'},
+                            {value: 'other', text: 'Другое'},
+                        ]
+                        expenseCategories.forEach((cat) => {
+                            const option = document.createElement('option')
+                            option.value = cat.value
+                            option.textContent = cat.text
+                            if (cat.value === transaction.category)
+                                option.selected = true
+                            categorySelect.appendChild(option)
+                        })
+                    }
+
+                    document.getElementById('editModal').style.display = 'flex'
+                }
+                async updateTransaction() {
+                    const id = parseInt(document.getElementById('editId').value)
+                    const description =
+                        document.getElementById('editDescription').value
+                    const amount = this.parseAmount(
+                        document.getElementById('editAmount').value,
+                    )
+                    const category =
+                        document.getElementById('editCategory').value
+                    const date = document.getElementById('editDate').value
+
+                    if (!amount || !category || !date) {
+                        this.showNotification(
+                            'Пожалуйста, заполните все поля',
+                            'error',
+                        )
+                        return
+                    }
+
+                    const transaction = {
+                        id,
+                        description,
+                        amount,
+                        category,
+                        date,
+                    }
+
+                    // Определяем тип по существующей транзакции
+                    const existingTransaction = this.transactions.find(
+                        (t) => t.id === id,
+                    )
+                    if (existingTransaction) {
+                        transaction.type = existingTransaction.type
+                    }
+
+                    try {
+                        await this.db.updateTransaction(transaction)
+                        const index = this.transactions.findIndex(
+                            (t) => t.id === id,
+                        )
+                        if (index !== -1) {
+                            this.transactions[index] = transaction
+                        }
+                        this.renderTransactions()
+                        this.updateDashboard()
+                        this.updateCharts()
+                        document.getElementById('editModal').style.display =
+                            'none'
+                        this.showNotification('Транзакция обновлена', 'success')
+                    } catch (error) {
+                        this.showNotification(
+                            'Ошибка при обновлении транзакции',
+                            'error',
+                        )
+                        console.error('Error updating transaction:', error)
+                    }
                 }
             }
 
